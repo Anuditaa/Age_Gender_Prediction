@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import kagglehub
 
 # ⬇️ Download UTKFace dataset
@@ -15,8 +16,8 @@ img_base_path = os.path.join(dataset_path, "UTKFace")
 
 # 📌 Hyperparameters
 IMG_SIZE = 64
-EPOCHS = 3
-FOLDS = 3
+EPOCHS = 10
+FOLDS = 5
 BATCH_SIZE = 32
 
 # ⬇️ Extract age and gender from filename
@@ -112,9 +113,12 @@ def create_gender_model():
 def create_age_group_model():
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(IMG_SIZE, IMG_SIZE, 1)),
-        MaxPooling2D(),
+        MaxPooling2D(2,2),
         Conv2D(64, (3, 3), activation='relu'),
-        MaxPooling2D(),
+        MaxPooling2D(2,2),
+        Conv2D(128, (3,3), activation='relu'),
+        MaxPooling2D(2,2),
+
         Flatten(),
         Dense(128, activation='relu'),
         Dropout(0.5),
@@ -122,6 +126,15 @@ def create_age_group_model():
     ])
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     return model
+
+# 🌱 Create ImageDataGenerator for augmentation
+datagen = ImageDataGenerator(
+    rotation_range=20,
+    zoom_range=0.15,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
+    horizontal_flip=True
+)
 
 # 🔁 Train Gender Model
 print("\n🔁 Training Gender Prediction Model...")

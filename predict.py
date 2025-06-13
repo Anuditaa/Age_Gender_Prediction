@@ -36,13 +36,13 @@ def predict_gender_and_age(img_path):
         return
 
     # Load and predict gender
-    gender_model = tf.keras.models.load_model("gender_cnn_model_test.h5")
+    gender_model = tf.keras.models.load_model("gender_cnn_model.h5")
     gender_pred = gender_model.predict(img)
     gender_index = np.argmax(gender_pred)
     gender_conf = gender_pred[0][gender_index]
 
     # Load and predict age group
-    age_model = tf.keras.models.load_model("age_group_cnn_model_test.h5")
+    age_model = tf.keras.models.load_model("age_group_cnn_model.h5")
     age_pred = age_model.predict(img)
     age_group_index = np.argmax(age_pred)
     age_group_conf = age_pred[0][age_group_index]
@@ -52,7 +52,7 @@ def predict_gender_and_age(img_path):
     print(f"🎂 Predicted Age Group: {age_group_labels[age_group_index]} ({age_group_conf:.2f} confidence)")
 
 # 🖼️ TEST: Replace with your image path
-test_image_path = "oldman.png"
+test_image_path = "anudita.jpg"
 if os.path.exists(test_image_path):
     predict_gender_and_age(test_image_path)
 else:

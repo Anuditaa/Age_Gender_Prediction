@@ -52,7 +52,7 @@ def predict_gender_and_age(img_path):
     print(f"🎂 Predicted Age Group: {age_group_labels[age_group_index]} ({age_group_conf:.2f} confidence)")
 
 # 🖼️ TEST: Replace with your image path
-test_image_path = "anudita.jpg"
+test_image_path = "photos/anudita.jpg"
 if os.path.exists(test_image_path):
     predict_gender_and_age(test_image_path)
 else:

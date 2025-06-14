@@ -47,7 +47,7 @@ def predict_gender_and_age(img_path):
     print(f"🎂 Predicted Age: {predicted_age:.1f} years")
 
 # 🖼️ TEST: Replace with your image path
-test_image_path = "photos/zayn.jpg"
+test_image_path = "photos/pic.jpg"
 if os.path.exists(test_image_path):
     predict_gender_and_age(test_image_path)
 else:

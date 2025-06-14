@@ -40,7 +40,8 @@ def predict_gender_and_age(img_path):
         age_pred = age_model.predict(img)
         predicted_age = age_pred[0][0]
 
-        result = f"🧠 Gender: {gender_map[gender_index]} ({gender_conf:.2f} confidence)\n🎂 Age: {predicted_age:.1f} years"
+ 
+        result = f"🧠 Gender: {gender_map[gender_index]}\n🎂 Age: {predicted_age:.1f} years"
         return result
     except Exception as e:
         return f"❌ Prediction error: {e}"

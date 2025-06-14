@@ -9,17 +9,17 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropou
 from tensorflow.keras.utils import to_categorical
 import kagglehub
 
-# ⬇️ Download UTKFace dataset
+#Download UTKFace dataset
 dataset_path = kagglehub.dataset_download("jangedoo/utkface-new")
 img_base_path = os.path.join(dataset_path, "UTKFace")
 
-# 📌 Hyperparameters
+#Hyperparameters
 IMG_SIZE = 64
 EPOCHS = 10
 FOLDS = 5
 BATCH_SIZE = 32
 
-# ⬇️ Extract age and gender from filename
+#Extract age and gender from filename
 def parse_filename(fname):
     try:
         parts = fname.split("_")
@@ -29,7 +29,7 @@ def parse_filename(fname):
     except:
         return None, None
 
-# 🧼 Image preprocessing
+#Image preprocessing
 def preprocess_image(img_path, predict_mode=False):
     try:
         img = Image.open(img_path).convert("L")
@@ -40,11 +40,11 @@ def preprocess_image(img_path, predict_mode=False):
             img = np.expand_dims(img, axis=0)  # batch dimension
         return img
     except Exception as e:
-        print(f"⚠️ Error processing {img_path}: {e}")
+        print(f"Error processing {img_path}: {e}")
         return None
 
-# 📥 Load images and extract labels
-print("📥 Loading and preprocessing UTKFace images...")
+#Load images and extract labels
+print("Loading and preprocessing UTKFace images...")
 images = []
 gender_labels = []
 age_labels = []
@@ -63,17 +63,17 @@ for fname in os.listdir(img_base_path):
         age_labels.append(age)
 
 if not images:
-    raise ValueError("❌ No images were successfully loaded. Please check dataset and structure.")
+    raise ValueError("No images were successfully loaded. Please check dataset and structure.")
 
-print(f"✅ Loaded {len(images)} images.")
+print(f"Loaded {len(images)} images.")
 
-# ✅ Prepare data
+#Prepare data
 X = np.array(images)
 y_gender = LabelEncoder().fit_transform(gender_labels)
 y_gender_cat = to_categorical(y_gender)
 y_age_reg = np.array(age_labels, dtype=np.float32)  # Regression target
 
-# 🧠 CNN model definitions
+#CNN model definitions
 def create_gender_model():
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(IMG_SIZE, IMG_SIZE, 1)),
@@ -104,13 +104,13 @@ def create_age_regression_model():
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
     return model
 
-# 🔁 Train Gender Model
-print("\n🔁 Training Gender Prediction Model...")
+#Train Gender Model
+print("\nTraining Gender Prediction Model...")
 kf = StratifiedKFold(n_splits=FOLDS, shuffle=True, random_state=42)
 gender_accuracies = []
 
 for fold, (train_idx, val_idx) in enumerate(kf.split(X, y_gender)):
-    print(f"\n📂 Gender - Fold {fold + 1}")
+    print(f"\nGender - Fold {fold + 1}")
     model_gender = create_gender_model()
     X_train, X_val = X[train_idx], X[val_idx]
     y_train, y_val = y_gender_cat[train_idx], y_gender_cat[val_idx]
@@ -118,20 +118,20 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X, y_gender)):
     model_gender.fit(X_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,
                      validation_data=(X_val, y_val), verbose=1)
     loss, acc = model_gender.evaluate(X_val, y_val, verbose=0)
-    print(f"✅ Fold {fold + 1} Accuracy: {acc:.4f}")
+    print(f"Fold {fold + 1} Accuracy: {acc:.4f}")
     gender_accuracies.append(acc)
 
 model_gender.save("gender_cnn_model.h5")
-print("\n💾 Gender model saved as gender_cnn_model.h5")
-print(f"🎯 Avg Gender Accuracy: {np.mean(gender_accuracies):.4f}")
+print("\nGender model saved as gender_cnn_model.h5")
+print(f"Avg Gender Accuracy: {np.mean(gender_accuracies):.4f}")
 
-# 🔁 Train Age Regression Model
-print("\n🔁 Training Age Regression Model...")
+#Train Age Regression Model
+print("\nTraining Age Regression Model...")
 kf = KFold(n_splits=FOLDS, shuffle=True, random_state=42)
 age_maes = []
 
 for fold, (train_idx, val_idx) in enumerate(kf.split(X, y_age_reg)):
-    print(f"\n📂 Age Regression - Fold {fold + 1}")
+    print(f"\nAge Regression - Fold {fold + 1}")
     model_age_reg = create_age_regression_model()
     X_train, X_val = X[train_idx], X[val_idx]
     y_train, y_val = y_age_reg[train_idx], y_age_reg[val_idx]
@@ -139,20 +139,20 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X, y_age_reg)):
     model_age_reg.fit(X_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,
                       validation_data=(X_val, y_val), verbose=1)
     loss, mae = model_age_reg.evaluate(X_val, y_val, verbose=0)
-    print(f"✅ Fold {fold + 1} MAE: {mae:.2f}")
+    print(f"Fold {fold + 1} MAE: {mae:.2f}")
     age_maes.append(mae)
 
 model_age_reg.save("age_regression_model.h5")
-print("\n💾 Age regression model saved as age_regression_model.h5")
-print(f"🎯 Avg Age MAE: {np.mean(age_maes):.2f}")
+print("\nAge regression model saved as age_regression_model.h5")
+print(f"Avg Age MAE: {np.mean(age_maes):.2f}")
 
-# 👤 Predict Gender and Age (Regression) from New Image
+#Predict Gender and Age (Regression) from New Image
 def predict_gender_and_age(img_path):
     gender_map = {0: "Male", 1: "Female"}
 
     img = preprocess_image(img_path, predict_mode=True)
     if img is None:
-        print("❌ Invalid image")
+        print("Invalid image")
         return
 
     # Predict gender
@@ -166,15 +166,15 @@ def predict_gender_and_age(img_path):
     age_pred = age_model.predict(img)
     predicted_age = age_pred[0][0]
 
-    print(f"\n🧠 Predicted Gender: {gender_map[gender_index]} ({gender_conf:.2f} confidence)")
-    print(f"🎂 Predicted Age: {predicted_age:.1f} years")
+    print(f"\nPredicted Gender: {gender_map[gender_index]} ({gender_conf:.2f} confidence)")
+    print(f"Predicted Age: {predicted_age:.1f} years")
 
-# 🖼️ TEST: Replace with your image
+#TEST: Replace with your image
 test_image_path = "pic.jpg"
 if os.path.exists(test_image_path):
     predict_gender_and_age(test_image_path)
 else:
-    print(f"🖼️ Test image not found: {test_image_path}")
+    print(f"Test image not found: {test_image_path}")
 
 
 

@@ -19,7 +19,7 @@ def preprocess_image(img_path, predict_mode=False):
             img = np.expand_dims(img, axis=0)  # batch
         return img
     except Exception as e:
-        print(f"❌ Error processing image: {e}")
+        print(f"Error processing image: {e}")
         return None
 
 # Predict gender and age
@@ -28,7 +28,7 @@ def predict_gender_and_age(img_path):
 
     img = preprocess_image(img_path, predict_mode=True)
     if img is None:
-        return "❌ Image processing failed"
+        return "Image processing failed"
 
     try:
         gender_model = tf.keras.models.load_model("gender_cnn_model.h5")
@@ -41,10 +41,10 @@ def predict_gender_and_age(img_path):
         predicted_age = age_pred[0][0]
 
  
-        result = f"🧠 Gender: {gender_map[gender_index]}\n🎂 Age: {predicted_age:.1f} years"
+        result = f"Gender: {gender_map[gender_index]}\nAge: {predicted_age:.1f} years"
         return result
     except Exception as e:
-        return f"❌ Prediction error: {e}"
+        return f"Prediction error: {e}"
 
 # GUI App
 def browse_image():
@@ -59,7 +59,7 @@ root.title("Gender and Age Predictor")
 root.geometry("400x300")
 root.resizable(False, False)
 
-tk.Label(root, text="👤 Select an Image to Predict", font=("Arial", 14)).pack(pady=20)
+tk.Label(root, text="Select an Image to Predict", font=("Arial", 14)).pack(pady=20)
 tk.Button(root, text="Browse Image", command=browse_image, font=("Arial", 12)).pack(pady=10)
 
 result_label = tk.Label(root, text="", wraplength=350, font=("Arial", 12))

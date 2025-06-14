@@ -8,7 +8,7 @@ import tensorflow as tf
 # Constants
 IMG_SIZE = 64
 
-# 🔄 Preprocess input image
+#Preprocess input image
 def preprocess_image(img_path, predict_mode=False):
     try:
         img = Image.open(img_path).convert("L")
@@ -19,10 +19,10 @@ def preprocess_image(img_path, predict_mode=False):
             img = np.expand_dims(img, axis=0)  # batch
         return img
     except Exception as e:
-        print(f"❌ Error processing image: {e}")
+        print(f"Error processing image: {e}")
         return None
 
-# 👤 Predict Gender and Age Group from New Image
+#Predict Gender and Age Group from New Image
 def predict_gender_and_age(img_path):
     gender_map = {0: "Male", 1: "Female"}
     age_group_labels = {
@@ -32,7 +32,7 @@ def predict_gender_and_age(img_path):
 
     img = preprocess_image(img_path, predict_mode=True)
     if img is None:
-        print("❌ Invalid image")
+        print("Invalid image")
         return
 
     # Load and predict gender
@@ -47,13 +47,13 @@ def predict_gender_and_age(img_path):
     age_group_index = np.argmax(age_pred)
     age_group_conf = age_pred[0][age_group_index]
 
-    # 🧠 Results
-    print(f"\n🧠 Predicted Gender: {gender_map[gender_index]} ({gender_conf:.2f} confidence)")
-    print(f"🎂 Predicted Age Group: {age_group_labels[age_group_index]} ({age_group_conf:.2f} confidence)")
+    #Results
+    print(f"\nPredicted Gender: {gender_map[gender_index]} ({gender_conf:.2f} confidence)")
+    print(f"Predicted Age Group: {age_group_labels[age_group_index]} ({age_group_conf:.2f} confidence)")
 
-# 🖼️ TEST: Replace with your image path
+#TEST: Replace with your image path
 test_image_path = "photos/anudita.jpg"
 if os.path.exists(test_image_path):
     predict_gender_and_age(test_image_path)
 else:
-    print(f"🖼️ Test image not found: {test_image_path}")
+    print(f"Test image not found: {test_image_path}")

@@ -15,8 +15,8 @@ img_base_path = os.path.join(dataset_path, "UTKFace")
 
 #Hyperparameters
 IMG_SIZE = 64
-EPOCHS = 10
-FOLDS = 5
+EPOCHS = 3
+FOLDS = 3
 BATCH_SIZE = 32
 
 #Extract age and gender from filename
@@ -77,9 +77,13 @@ y_age_reg = np.array(age_labels, dtype=np.float32)  # Regression target
 def create_gender_model():
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(IMG_SIZE, IMG_SIZE, 1)),
-        MaxPooling2D(),
+        MaxPooling2D(2,2),
         Conv2D(64, (3, 3), activation='relu'),
-        MaxPooling2D(),
+        MaxPooling2D(2,2),
+        Conv2D(128, (3, 3), activation='relu'),
+        MaxPooling2D(2,2),
+        Conv2D(256, (3, 3), activation='relu'),
+        MaxPooling2D(2,2),
         Flatten(),
         Dense(128, activation='relu'),
         Dropout(0.5),
@@ -95,6 +99,8 @@ def create_age_regression_model():
         Conv2D(64, (3, 3), activation='relu'),
         MaxPooling2D(2, 2),
         Conv2D(128, (3, 3), activation='relu'),
+        MaxPooling2D(2, 2),
+        Conv2D(256, (3, 3), activation='relu'),
         MaxPooling2D(2, 2),
         Flatten(),
         Dense(128, activation='relu'),
@@ -121,7 +127,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X, y_gender)):
     print(f"Fold {fold + 1} Accuracy: {acc:.4f}")
     gender_accuracies.append(acc)
 
-model_gender.save("gender_cnn_model.h5")
+model_gender.save("gender_cnn_model_test.h5")
 print("\nGender model saved as gender_cnn_model.h5")
 print(f"Avg Gender Accuracy: {np.mean(gender_accuracies):.4f}")
 
@@ -142,7 +148,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X, y_age_reg)):
     print(f"Fold {fold + 1} MAE: {mae:.2f}")
     age_maes.append(mae)
 
-model_age_reg.save("age_regression_model.h5")
+model_age_reg.save("age_regression_model_test.h5")
 print("\nAge regression model saved as age_regression_model.h5")
 print(f"Avg Age MAE: {np.mean(age_maes):.2f}")
 
@@ -156,13 +162,13 @@ def predict_gender_and_age(img_path):
         return
 
     # Predict gender
-    gender_model = tf.keras.models.load_model("gender_cnn_model.h5")
+    gender_model = tf.keras.models.load_model("gender_cnn_model_test.h5")
     gender_pred = gender_model.predict(img)
     gender_index = np.argmax(gender_pred)
     gender_conf = gender_pred[0][gender_index]
 
     # Predict age (regression)
-    age_model = tf.keras.models.load_model("age_regression_model.h5")
+    age_model = tf.keras.models.load_model("age_regression_model_test.h5")
     age_pred = age_model.predict(img)
     predicted_age = age_pred[0][0]
 
